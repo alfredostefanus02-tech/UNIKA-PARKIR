@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test API Login — Parkir Cerdas Unika</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background:#0f172a; color:#e2e8f0; min-height:100vh; padding:20px; }
+  h1 { color:#60a5fa; font-size:20px; margin-bottom:4px; }
+  .sub { color:#94a3b8; font-size:13px; margin-bottom:24px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:900px; }
+  @media(max-width:600px){ .grid{ grid-template-columns:1fr; } }
+  .card { background:#1e293b; border-radius:12px; padding:20px; border:1px solid #334155; }
+  .card-title { font-size:14px; font-weight:700; color:#f1f5f9; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .badge { background:#1d4ed8; color:#bfdbfe; padding:2px 8px; border-radius:20px; font-size:11px; }
+  .badge-post { background:#166534; color:#bbf7d0; }
+  label { display:block; font-size:12px; color:#94a3b8; margin-bottom:4px; font-weight:500; }
+  input, select { width:100%; padding:9px 12px; background:#0f172a; border:1px solid #475569; border-radius:7px; color:#f1f5f9; font-size:13px; font-family:inherit; margin-bottom:12px; outline:none; }
+  input:focus, select:focus { border-color:#60a5fa; }
+  .btn { width:100%; padding:10px; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; transition:opacity .2s; font-family:inherit; }
+  .btn:active { opacity:.8; }
+  .btn-blue { background:#2563eb; color:white; }
+  .btn-green { background:#16a34a; color:white; }
+  .btn-red { background:#dc2626; color:white; }
+  .btn-purple { background:#7c3aed; color:white; }
+  .result { margin-top:14px; background:#0f172a; border-radius:8px; padding:12px; border:1px solid #334155; min-height:60px; }
+  .result pre { font-size:12px; white-space:pre-wrap; word-break:break-all; font-family:'Consolas',monospace; line-height:1.6; }
+  .ok { color:#4ade80; }
+  .err { color:#f87171; }
+  .info-box { background:#1e3a5f; border:1px solid #1d4ed8; border-radius:8px; padding:12px 14px; margin-bottom:20px; max-width:900px; }
+  .info-box p { font-size:13px; color:#93c5fd; line-height:1.6; }
+  .info-box code { background:#0f172a; padding:1px 6px; border-radius:4px; font-family:'Consolas',monospace; font-size:12px; color:#60a5fa; }
+  .token-box { background:#0f172a; border:1px solid #16a34a; border-radius:8px; padding:10px 12px; margin-top:10px; font-family:'Consolas',monospace; font-size:11px; color:#4ade80; word-break:break-all; display:none; }
+  .token-label { font-size:11px; color:#94a3b8; margin-bottom:4px; }
+  .acct { display:flex; flex-direction:column; gap:6px; }
+  .acct-item { display:flex; justify-content:space-between; align-items:center; padding:7px 10px; background:#0f172a; border-radius:6px; border:1px solid #334155; cursor:pointer; transition:border-color .2s; }
+  .acct-item:hover { border-color:#60a5fa; }
+  .acct-item .em { font-size:12px; font-family:'Consolas',monospace; color:#93c5fd; }
+  .acct-item .pw { font-size:12px; color:#4ade80; }
+  .acct-item .role { font-size:11px; color:#f59e0b; }
+  .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+  .dot-ok { background:#4ade80; }
+  .dot-err { background:#f87171; }
+  .dot-wait { background:#94a3b8; }
+  .sep { height:1px; background:#334155; margin:14px 0; }
+</style>
+</head>
+<body>
+
+<h1>🧪 Test API — Parkir Cerdas Unika</h1>
+<p class="sub">Halaman ini untuk memastikan backend Laravel berjalan dengan benar</p>
+
+<div class="info-box">
+  <p>
+    <strong style="color:#60a5fa">Server URL:</strong> <code id="api-url">http://127.0.0.1:8000/api</code> &nbsp;
+    <span id="server-status" style="font-size:12px">
+      <span class="status-dot dot-wait" id="dot"></span>
+      <span id="status-text">Belum dicek</span>
+    </span>
+    &nbsp;&nbsp;
+    <button onclick="cekServer()" style="background:#1d4ed8;color:white;border:none;border-radius:5px;padding:4px 10px;font-size:12px;cursor:pointer">Cek Server</button>
+  </p>
+</div>
+
+<div class="grid">
+
+  <!-- LOGIN -->
+  <div class="card">
+    <div class="card-title">
+      🔐 POST /api/auth/login
+      <span class="badge badge-post">POST</span>
+    </div>
+    <label>Email</label>
+    <input type="email" id="l-email" value="admin@unika.ac.id">
+    <label>Password</label>
+    <input type="password" id="l-pass" value="admin123">
+    <button class="btn btn-blue" onclick="testLogin()">Kirim Request Login</button>
+
+    <div class="sep"></div>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:8px">Klik akun untuk auto-isi:</p>
+    <div class="acct">
+      <div class="acct-item" onclick="fillLogin('admin@unika.ac.id','admin123')">
+        <span class="em">admin@unika.ac.id</span>
+        <span class="pw">admin123</span>
+        <span class="role">Admin</span>
+      </div>
+      <div class="acct-item" onclick="fillLogin('dosen@unika.ac.id','dosen123')">
+        <span class="em">dosen@unika.ac.id</span>
+        <span class="pw">dosen123</span>
+        <span class="role">Dosen</span>
+      </div>
+      <div class="acct-item" onclick="fillLogin('mahasiswa@unika.ac.id','mhs123')">
+        <span class="em">mahasiswa@unika.ac.id</span>
+        <span class="pw">mhs123</span>
+        <span class="role">Mahasiswa</span>
+      </div>
+    </div>
+
+    <div class="result" id="r-login">
+      <pre style="color:#475569">// Hasil response akan muncul di sini...</pre>
+    </div>
+    <div class="token-label" id="tl" style="margin-top:8px;display:none">Token yang didapat:</div>
+    <div class="token-box" id="token-box"></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="card">
+    <div class="card-title">
+      📝 POST /api/auth/register
+      <span class="badge badge-post">POST</span>
+    </div>
+    <label>Nama Lengkap</label>
+    <input type="text" id="r-nama" placeholder="Contoh: Budi Santoso">
+    <label>Peran</label>
+    <select id="r-peran">
+      <option value="mahasiswa">Mahasiswa</option>
+      <option value="dosen">Dosen</option>
+      <option value="staff">Staff</option>
+    </select>
+    <label>NPM / NIDN</label>
+    <input type="text" id="r-npm" placeholder="220301099">
+    <label>Email</label>
+    <input type="email" id="r-email" placeholder="nama@unika.ac.id">
+    <label>Password (min 8 karakter)</label>
+    <input type="password" id="r-pass" placeholder="password123">
+    <button class="btn btn-green" onclick="testRegister()">Kirim Request Register</button>
+    <div class="result" id="r-register">
+      <pre style="color:#475569">// Hasil response akan muncul di sini...</pre>
+    </div>
+  </div>
+
+  <!-- CEK SLOT -->
+  <div class="card">
+    <div class="card-title">
+      🅿️ GET /api/slot/ringkasan
+      <span class="badge">GET</span>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Memerlukan token dari login. Login dulu di atas.</p>
+    <button class="btn btn-purple" onclick="testSlot()">Cek Ringkasan Slot Parkir</button>
+    <div class="result" id="r-slot">
+      <pre style="color:#475569">// Hasil response akan muncul di sini...</pre>
+    </div>
+  </div>
+
+  <!-- HEALTH CHECK -->
+  <div class="card">
+    <div class="card-title">
+      💚 GET /api/health
+      <span class="badge">GET</span>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Cek apakah server Laravel berjalan dengan benar.</p>
+    <button class="btn btn-red" onclick="cekServer()">Cek Health Server</button>
+    <div class="result" id="r-health">
+      <pre style="color:#475569">// Hasil response akan muncul di sini...</pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000/api';
+let savedToken = '';
+
+function show(id, data, isErr) {
+  const el = document.getElementById(id);
+  el.innerHTML = `<pre class="${isErr ? 'err' : 'ok'}">${JSON.stringify(data, null, 2)}</pre>`;
+}
+
+function showRaw(id, text, isErr) {
+  document.getElementById(id).innerHTML = `<pre class="${isErr ? 'err' : 'ok'}">${text}</pre>`;
+}
+
+async function cekServer() {
+  const dot  = document.getElementById('dot');
+  const stxt = document.getElementById('status-text');
+  dot.className = 'status-dot dot-wait';
+  stxt.textContent = 'Mengecek...';
+  try {
+    const res  = await fetch(API + '/health');
+    const data = await res.json();
+    show('r-health', data, false);
+    dot.className = 'status-dot dot-ok';
+    stxt.textContent = 'Server berjalan ✅';
+  } catch(e) {
+    showRaw('r-health', '❌ Tidak dapat terhubung ke server!\n\nPastikan:\n1. XAMPP → MySQL sudah Start (hijau)\n2. Terminal VS Code → php artisan serve sudah dijalankan\n3. Tidak ada error di terminal', true);
+    dot.className = 'status-dot dot-err';
+    stxt.textContent = 'Server tidak berjalan ❌';
+  }
+}
+
+function fillLogin(email, pass) {
+  document.getElementById('l-email').value = email;
+  document.getElementById('l-pass').value  = pass;
+}
+
+async function testLogin() {
+  const email = document.getElementById('l-email').value;
+  const pass  = document.getElementById('l-pass').value;
+  showRaw('r-login', 'Mengirim request...', false);
+  try {
+    const res  = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+    show('r-login', data, !data.success);
+    if (data.success && data.data?.token) {
+      savedToken = data.data.token;
+      document.getElementById('token-box').style.display = 'block';
+      document.getElementById('tl').style.display = 'block';
+      document.getElementById('token-box').textContent = savedToken;
+    }
+  } catch(e) {
+    showRaw('r-login', '❌ ' + e.message + '\n\nServer tidak berjalan atau CORS belum dikonfigurasi.\nJalankan: php artisan serve', true);
+  }
+}
+
+async function testRegister() {
+  const body = {
+    nama:                  document.getElementById('r-nama').value,
+    peran:                 document.getElementById('r-peran').value,
+    npm_nidn:              document.getElementById('r-npm').value,
+    email:                 document.getElementById('r-email').value,
+    password:              document.getElementById('r-pass').value,
+    password_confirmation: document.getElementById('r-pass').value,
+  };
+  showRaw('r-register', 'Mengirim request...', false);
+  try {
+    const res  = await fetch(API + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    show('r-register', data, !data.success);
+  } catch(e) {
+    showRaw('r-register', '❌ ' + e.message, true);
+  }
+}
+
+async function testSlot() {
+  if (!savedToken) {
+    showRaw('r-slot', '⚠️  Login dulu untuk mendapatkan token!', true);
+    return;
+  }
+  showRaw('r-slot', 'Mengirim request...', false);
+  try {
+    const res  = await fetch(API + '/slot/ringkasan', {
+      headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + savedToken }
+    });
+    const data = await res.json();
+    show('r-slot', data, !data.success);
+  } catch(e) {
+    showRaw('r-slot', '❌ ' + e.message, true);
+  }
+}
+
+// Auto cek server saat halaman dibuka
+window.onload = () => setTimeout(cekServer, 500);
+</script>
+</body>
+</html>
